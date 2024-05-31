@@ -1,5 +1,7 @@
 var express = require('express')
+var cors = require('cors')
 var app = express()
+app.use(cors())
 app.use(express.static('public'));
 var http = require('http').Server(app);
 var port = process.env.PORT || 3000;
@@ -20,6 +22,11 @@ io.on('connection', function(socket) {
         socket.broadcast.emit('move', msg);
     });
 });
+
+app.get('/api/data', (req, res) => {
+    // Handle the request, fetch data, and send a response
+    res.json({ message: 'Hello from Express!' });
+  });
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/default.html')

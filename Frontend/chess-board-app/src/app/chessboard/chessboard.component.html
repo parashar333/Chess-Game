@@ -1,12 +1,9 @@
 <div class="chessboard">
-    <div class="row" *ngFor="let row of board; let i = index">
-      <div class="square" *ngFor="let square of row; let j = index">
-        <div *ngIf="selectedPiece !== null" cdkDropList (cdkDropListDropped)="movePiece($event, selectedPiece?.row || -1, selectedPiece?.col || -1, i, j)">
-          <div class="piece" *ngIf="square && square.type !== PieceType.Empty" cdkDrag>
-            <img [src]="'assets/' + square.color + '-' + square.type + '.png'" alt="{{ square.color }} {{ square.type }}">
-          </div>
-        </div>
+  <div class="row" *ngFor="let row of board; let i = index">
+    <div class="square" *ngFor="let square of row; let j = index" cdkDropList [cdkDropListData]="row" (cdkDropListDropped)="drop($event, i, j)">
+      <div class="piece" *ngIf="square && square.type !== PieceType.Empty" [cdkDragData]="square" cdkDrag>
+        <img [src]="'assets/' + square.color + '-' + square.type + '.png'" alt="{{ square.color }} {{ square.type }}">
       </div>
     </div>
   </div>
-  
+</div>

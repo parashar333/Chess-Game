@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PieceType, PieceColor } from 'src/constants';
 import { ChessPiece } from '../chess-piece';
+import { DataserviceService } from '../dataservice.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-chessboard',
@@ -11,10 +13,17 @@ export class ChessboardComponent implements OnInit{
   PieceType = PieceType; //PieceType enum
   board:ChessPiece[][] = [];
   selectedPiece: {row: number, col: number} | null = null;
+  data:any;
 
-  constructor() {}
+  constructor(private dataservice: DataserviceService) {}
 
   ngOnInit(): void {
+    this.dataservice.getData().subscribe({
+      next: (data)=> {this.data = data;
+        console.log('Data received', this.data);},
+      error: (error) => {console.error(error)}
+    }
+    );
       //Initializing the chess board
       this.initializeBoard()
   }
@@ -54,14 +63,17 @@ export class ChessboardComponent implements OnInit{
     }
   }
 
-  movePiece(event: any, fromRow: number, fromCol: number, toRow: number, toCol: number): void {
-    if (this.isValidMove(fromRow, fromCol, toRow, toCol)) {
-      this.board[toRow][toCol] = this.board[fromRow][fromCol];
-      this.board[fromRow][fromCol] = {type: PieceType.Empty, color: PieceColor.Empty};
+  drop(event: CdkDragDrop<ChessPiece[]>, toRow: number, toCol: number): void {
+    if (!event.isPointerOverContainer) {
+      return;
     }
-  }
+    const fromRow = event.previousIndex;
+    const fromCol = this.board[fromRow].indexOf(event.item.data);
 
-  isValidMove(fromRow: number, fromCol: number, toRow: number, toCol: number): boolean {
-    return true;
+    // Perform the move
+    this.board[toRow][toCol] = this.board[fromRow][fromCol];
+    this.board[fromRow][fromCol] = {type: PieceType.Empty, color: PieceColor.Empty};
+
+    this.board = [...this.board];
   }
 }
